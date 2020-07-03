@@ -1,0 +1,237 @@
+//print hello
+begin
+dbms_output.put_line('Hello');
+end;
+-------------------------------------------
+//print 1 to 10
+begin
+for i in 1..10
+loop
+dbms_output.put_line('i= '||i);
+end loop;
+end;
+----------------------------------------------
+//find odd or even
+declare
+a number:=5;
+begin
+	if mod(a,2)=0 then
+		dbms_output.put_line('Even number');
+	else
+		dbms_output.put_line('Odd number');
+	end if;
+end;
+/
+----------------------------------------------
+// taking value from user
+declare
+a number:=&a;
+begin
+	if mod(a,2)=0 then
+		dbms_output.put_line(a || 'is' ||'Even number');
+	else
+		dbms_output.put_line(a || 'is' ||'Odd number');
+	end if;
+end;
+----------------------------------------------
+create table std(id number(3),name varchar2(10),age number(3));
+----------------------------------------------
+//enter row into std table if age is >18
+----------------------------------------------
+declare
+a number:=&a;
+id number(3);
+begin
+	if a>17 then
+		insert into std values(1,'vijay',a);
+	else
+		dbms_output.put_line('Enter valid age');
+	end if;
+end;
+----------------------------------------------
+//example of %type
+declare
+vname std.name%type;
+begin
+select name into vname from std where id=1;
+dbms_output.put_line(vname);
+end;
+/
+-------------------------------------------------
+//example of %rowtype
+declare
+vname std%rowtype;
+begin
+select * into vname from std where id=1;
+dbms_output.put_line(vname.name);
+end;
+/
+-------------------------------------------------
+//example of cursor
+declare
+	vid std.id%type;
+	vname std.name%type;
+begin
+	vid:=&id;
+	select id,name into vid,vname from std where id=vid;
+	if sql%notfound then	
+		dbms_output.put_line('No data Found');
+	else
+		dbms_output.put_line(vid);
+	end if;
+end;
+/
+-----------------------------------------------------
+//declare cursor implicit
+	i number(2);
+	total_rows number(2);
+begin
+	i:=&i;
+	update std set age=age+4 where id=i;
+	if SQL%notfound then
+		dbms_output.put_line('update');
+	elsif SQL%found then
+		total_rows:=SQL%rowcount;
+		dbms_output.put_line(total_rows||'afftedted');
+	end if;
+end;
+/
+----------------------------------------------------
+//example of explicit cursor
+declare
+	tid std.id%type;
+	tname std.name%type;
+	tage std.age%type;
+	cursor c is select id,name,age from std;
+begin
+	open c;
+	if c%ISOPEN then
+		loop
+			fetch c into tid,tname,tage;
+				exit when c%NOTFOUND;
+				dbms_output.put_line(tid  || '  ' || tname);
+		end loop;
+		commit;
+	else
+		dbms_output.put_line('Cursor can not be opened');
+	end if;
+end;
+/
+-----------------------------------------------------------
+//example of tigger
+CREATE OR REPLACE TRIGGER display_salary_changes 
+BEFORE DELETE OR INSERT OR UPDATE ON deposit
+FOR EACH ROW 
+WHEN (NEW.ACTNO > 0) 
+DECLARE 
+   sal_diff number; 
+BEGIN 
+   sal_diff := :NEW.amount  - :OLD.amount; 
+   dbms_output.put_line('Old salary: ' || :OLD.amount); 
+   dbms_output.put_line('New salary: ' || :NEW.amount); 
+   dbms_output.put_line('Salary difference: ' || sal_diff); 
+END; 
+/ 
+
+-------------------------------------------------------------
+create or replace trigger tsun before insert or update or delete on std
+begin
+	if(to_char(sysdate,'dy')in('sun'))then
+		raise_application_error(-20001,'today is sunday go home');
+	end if;
+end;
+/
+------------------------------------------------------------------
+create or replace trigger tt2 before update or insert on std 
+declare
+ 
+begin
+ 
+diff number(6,2);
+
+diff:=:old.bal-:new.bal; if :new.bal<0 then
+dbms_output.put_line(‘Balance	should	not	be	negative	while insertion);
+elsif diff < 0 then
+dbms_output.put_line('Balance should not be negative while Updation ’);
+else
+dbms_output.put_line('Successful’)
+end if;
+end;
+/
+
+
+------------------------------------
+CREATE OR REPLACE TRIGGER Print_salary_changes
+  BEFORE DELETE OR INSERT OR UPDATE ON Emp_tab
+  FOR EACH ROW
+WHEN (new.Empno > 0)
+DECLARE
+    sal_diff number;
+BEGIN
+    sal_diff  := :new.sal  - :old.sal;
+    dbms_output.put('Old salary: ' || :old.sal);
+    dbms_output.put('  New salary: ' || :new.sal);
+    dbms_output.put_line('  Difference ' || sal_diff);
+END;
+/
+---------------------------------------------
+
+declare
+	a number;
+	procedure sq(x IN OUT number)is
+begin
+	x:=x*x;
+end;
+begin
+	a:=2;
+	sq(a);
+	dbms_output.put_line('square of='||a);
+end;
+/
+----------------------------------------------
+----------------------------------------------
+CREATE OR REPLACE FUNCTION totalCustomers 
+RETURN number IS 
+   total number(2) := 0; 
+BEGIN 
+   SELECT count(*) into total 
+   FROM customers; 
+    
+   RETURN total; 
+END; 
+/ 
+
+
+
+DECLARE 
+   c number(2); 
+BEGIN 
+   c := totalCustomers(); 
+   dbms_output.put_line('Total no. of Customers: ' || c); 
+END; 
+/
+----------------------------------------------
+
+DECLARE 
+   a number; 
+   b number; 
+   c number; 
+FUNCTION findMax(x IN number, y IN number)  
+RETURN number 
+IS 
+    z number; 
+BEGIN 
+   IF x > y THEN 
+      z:= x; 
+   ELSE 
+      Z:= y; 
+   END IF;  
+   RETURN z; 
+END; 
+BEGIN 
+   a:= 23; 
+   b:= 45;  
+   c := findMax(a, b); 
+   dbms_output.put_line(' Maximum of (23,45): ' || c); 
+END; 
+/ 
