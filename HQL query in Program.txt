@@ -1,0 +1,16 @@
+Query qry = session.createQuery("delete from student p
+where p.rno=:var");
+	        qry.setParameter("var",110);
+	        int res = qry.executeUpdate();
+
+
+Query qry = session.createQuery("delete from student p
+where p.rno=?");
+	        qry.setParameter(0,1);
+	        int res = qry.executeUpdate();
+
+
+Query qry = s.createQuery("select s.name from student s");
+	      java.util.List list=qry.list();
+              System.out.println(list);
+
